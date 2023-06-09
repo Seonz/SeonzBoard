@@ -1,4 +1,4 @@
-package sec01.ex01;
+package sec02.ex01;
 
 import java.sql.Connection;
 import java.sql.Date;
