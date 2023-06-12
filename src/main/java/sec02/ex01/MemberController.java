@@ -1,5 +1,12 @@
 package sec02.ex01;
-
+/*
+ * 컨트롤러 역할을 하는 MemberController클래스
+ * getPathInfo() 메서드를 이용해 두 단계로 이루어진 요청을 가져옴
+ * action 값에 따라 if문을 분기해서 요청한 작업을 수행하는데 action 값이 null이거나
+ * ./listMembers.do 인 경우 회원 조회 기능을 수행함
+ * 만약 action 값이 /memberForm.do면 회원가입창을 나타내고,
+ * action 값이 /addMeber.do면 전송된 회원 정보들을 테이블에 추가함
+ */
 import java.io.IOException;
 import java.util.List;
 
@@ -48,20 +55,33 @@ public class MemberController extends HttpServlet
 		 * 서버는 요청 데이터를 올바르게 해석하고 처리할 수 있게 됨
 		 */
 		response.setContentType("text/html;charset=utf-8");
-		String action = request.getPathInfo();
+		String action = request.getPathInfo(); // URL에서 요청명을 가져옴
 		System.out.println("action:" +action);
 		if(action == null || action.equals("/listMembers.do"))
+		//최초 요청이거나 action 값이 /memberList.do면 회원 목록을 출력
 		{
-			
+			List<MemberVO> membersList = memberDAO.listMembers();
+			request.setAttribute("membersList", membersList);
+			nextPage = "/test02/listMembers.jsp"; //test02 폭더의 listMember.jsp로 포워딩
+		}else if(action.equals("/addMember.do")) // action 값이 /addMember.do면 전송된 회원 정보를 가져와서 테이블에 추가
+		{
+			String id = request.getParameter("id");
+			String pwd = request.getParameter("pwd");
+			String name = request.getParameter("name");
+			String email = request.getParameter("email");
+			MemberVO memberVO = new MemberVO (id, pwd, name, email);
+			memberDAO.addMember(memberVO);
+			nextPage= "/member/listMembers.do"; //회원 등록 후 다시 회원 목록을 출력
+		}else if (action.equals("/memberForm.do")) //action 값이 /memberForm.do면 회원 가입 창을 화면에 출력
+		{
+			nextPage = "/test02/memberForm.jsp"; //test02 폴더의 memberForm.jsp로 포워딩
+		}else // 그 외 다른 action 값은 회원 목록을 출력
+		{
+			List<MemberVO> membersList = memberDAO.listMembers();
+			request.setAttribute("membersList", membersList);
+			nextPage = "/test02/listMember.jsp";
 		}
-		List<MemberVO> membersList = memberDAO.listMembers(); 
-		// 요청에 대해 회원 정보 조회
-		request.setAttribute("membersList", membersList); 
-		// 조회한 회원 정보를 request에 바인딩 함
-		RequestDispatcher dispatch 
-		= request.getRequestDispatcher("/test01/listMembers.jsp");
+		RequestDispatcher dispatch = request.getRequestDispatcher(nextPage); //nextPage에 지정한 요청명으로 다시 서블릿에 요청함
 		dispatch.forward(request, response);
-		// 컨트롤러에서 표시하고자 하는 JSP로 포워딩 함
-		// 포워딩 : 클라이언트의 요청을 다른 리소스(페이지, 서블릿, JSP 등)로 전달하는 기능 
 	}
 }

@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/mem.do")
+//@WebServlet("/mem.do")
 public class MemberController extends HttpServlet 
 /* 
  * extends : 클래스 상속을 나타내는 키워드
